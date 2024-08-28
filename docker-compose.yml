@@ -1,0 +1,230 @@
+services:
+  manager-service:
+    build:
+      context: ./manager
+    ports:
+      - ${MANAGER_PORT}:${MANAGER_PORT}
+    env_file:
+      - .env
+    depends_on:
+      - submanager-service
+    networks:
+      - services-network
+
+  manager-dapr:
+    image: "daprio/daprd:edge"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+    command: ["./daprd",
+        "-app-port", "3005",
+        "-app-id", "manager-service",
+        "-app-protocol", "http",
+        "-dapr-http-port", "3500",
+        "-config", "./dapr/config.yaml",
+        "-resources-path", "./dapr/components",
+        ]
+    volumes:
+      - "./dapr/:/dapr"
+    depends_on:
+      - manager-service
+    network_mode: "service:manager-service"
+
+  submanager-service:
+    build:
+      context: ./submanager
+    ports:
+      - ${SUB_MANAGER_PORT}:${SUB_MANAGER_PORT}
+    env_file:
+      - .env
+    depends_on:
+      - dbaccessor-service
+      - aiaccessor-service
+      - newsaccessor-service
+      - emailaccessor-service
+    networks:
+      - services-network
+
+  submanager-dapr:
+    image: "daprio/daprd:edge"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+    command: ["./daprd",
+        "-app-port", "3002",
+        "-app-id", "submanager-service",
+        "-app-protocol", "http",
+        "-dapr-http-port", "3500",
+        "-config", "./dapr/config.yaml",
+        "-resources-path", "./dapr/components",
+        ]
+    volumes:
+      - "./dapr/:/dapr"
+    depends_on:
+      - submanager-service
+    network_mode: "service:submanager-service"
+
+  dbaccessor-service:
+    build:
+      context: ./dbAccessor
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    env_file:
+      - .env
+    networks:
+      - services-network
+    
+  dbaccessor-dapr:
+    image: "daprio/daprd:edge"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+    command: ["./daprd",
+        "-app-port", "8080",
+        "-app-id", "dbaccessor-service",
+        "-app-protocol", "http",
+        "-dapr-http-port", "3500",
+        "-config", "./dapr/config.yaml",
+        ]
+    volumes:
+      - "./dapr/:/dapr"
+    depends_on:
+      - dbaccessor-service
+    network_mode: "service:dbaccessor-service"
+
+  aiaccessor-service:
+    build:
+      context: ./aiAccessor
+    ports:
+      - ${AI_PORT}:${AI_PORT}
+    env_file:
+      - .env
+    networks:
+      - services-network
+  
+  aiaccessor-dapr:
+    image: "daprio/daprd:edge"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+    command: ["./daprd",
+        "-app-port", "3001",
+        "-app-id", "aiaccessor-service",
+        "-app-protocol", "http",
+        "-dapr-http-port", "3500",
+        "-config", "./dapr/config.yaml",
+        ]
+    volumes:
+      - "./dapr/:/dapr"
+    depends_on:
+      - aiaccessor-service
+    network_mode: "service:aiaccessor-service"
+
+  newsaccessor-service:
+    build:
+      context: ./newsAccessor
+    ports:
+      - ${NEWS_PORT}:${NEWS_PORT}
+    env_file:
+      - .env
+    networks:
+      - services-network
+  
+  newsaccessor-dapr:
+    image: "daprio/daprd:edge"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+    command: ["./daprd",
+        "-app-port", "3000",
+        "-app-id", "newsaccessor-service",
+        "-app-protocol", "http",
+        "-dapr-http-port", "3500",
+        "-config", "./dapr/config.yaml",
+        ]
+    volumes:
+      - "./dapr/:/dapr"
+    depends_on:
+      - newsaccessor-service
+    network_mode: "service:newsaccessor-service"
+
+  emailaccessor-service:
+    build:
+      context: ./emailAccessor
+    ports:
+      - ${EMAIL_PORT}:${EMAIL_PORT}
+    env_file:
+      - .env
+    networks:
+      - services-network
+  
+  emailaccessor-dapr:
+    image: "daprio/daprd:edge"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+        window: 120s
+    command: ["./daprd",
+        "-app-port", "3003",
+        "-app-id", "emailaccessor-service",
+        "-app-protocol", "http",
+        "-dapr-http-port", "3500",
+        "-config", "./dapr/config.yaml",
+        ]
+    volumes:
+      - "./dapr/:/dapr"
+    depends_on:
+      - emailaccessor-service
+    network_mode: "service:emailaccessor-service"
+    
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - services-network
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - services-network
+
+  dapr_placement:
+    image: daprio/dapr
+    container_name: dapr_placement
+    command: ["./placement"]
+    ports:
+      - "50005:50005"
+    networks:
+      - services-network
+
+networks:
+  services-network:
+    driver: bridge
+
+  
+
+
+
