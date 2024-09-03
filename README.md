@@ -25,19 +25,6 @@ To run tests, after docker compose finished go to the browser and insert the fol
   http://localhost:3005/manager?email=youremail
 ```
 
-The real emails that stored it the DB:
-
-- yakprog@gmail.com
-- venyab@zion-net.co.il
-
-There are more emails in the db but they are not real (check db screenshot)
-
-So Venia please run it with:
-
-```bash
-  http://localhost:3005/manager?email=venyab@zion-net.co.il
-```
-
 Then check your spam box in the email
 
 ## Screenshots
@@ -58,6 +45,6 @@ Response:
 
 ![Scheme Screenshot](./images/scheme.PNG)
 
-## Contact
+## Author
 
-- Yakir Ovadya - email: yakprog@gmail.com
+- Yakir Ovadya
