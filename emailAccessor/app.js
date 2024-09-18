@@ -61,7 +61,7 @@ app.post("/email", async (req, res) => {
     const msg = {
       to: emailTo, // Recipient email
       from: "yakprog@gmail.com", // Verified sender
-      subject: "ZioNet Newsletter - AI Articles Request",
+      subject: "NewsIQ Newsletter - AI Articles Request",
       html: htmlContent,
     };
 
