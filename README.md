@@ -9,10 +9,10 @@ make sure you installed docker hub on your computer than:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yakprog/zionetFP.git
+git clone https://github.com/yakprog/NewsIQ.git
 
 # Navigate to the project directory
-cd zionetFP
+cd NewsIQ
 
 # bulid and run docker-compose
 docker-compose up -d --build
